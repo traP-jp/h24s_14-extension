@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ClipList from './ClipList.vue'
+import NoteList from './NoteList.vue'
 </script>
 
 <template>
-  <ClipList />
+  <NoteList />
 </template>
 
 <style></style>
