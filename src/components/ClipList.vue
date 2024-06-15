@@ -34,7 +34,7 @@ const paginatedClips = computed(() => {
   return clips.value.slice(start, end)
 })
 const deleteNote = (id: number) => {
-  clips.value = clips.value.filter(note => note.id !== id)
+  clips.value = clips.value.filter((note) => note.id !== id)
 }
 </script>
 
@@ -44,7 +44,7 @@ const deleteNote = (id: number) => {
       <v-list-item-content>
         <v-list-item-title>{{ note.text }}</v-list-item-title>
         <v-list-item-subtitle>{{ note.timestamp }}</v-list-item-subtitle>
-        <v-btn variant = "tonal" color = "primary" @click="deleteNote(note.id)">削除</v-btn>
+        <v-btn variant="tonal" color="primary" @click="deleteNote(note.id)">削除</v-btn>
       </v-list-item-content>
     </v-list-item>
   </v-list>
