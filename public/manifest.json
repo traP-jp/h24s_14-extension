@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "h-14 Extension",
+  "description": "This is our sample extension",
+  "version": "1.0",
+  "permissions": [
+    "tabs","https://q.trap.jp/*"
+  ],
+  "content_scripts": [
+    {
+    "matches": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "js": ["content.js"]
+    }
+],
+  "action": {
+    "default_popup": "index.html"
+  }
+}
