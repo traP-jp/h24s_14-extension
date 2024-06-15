@@ -40,10 +40,13 @@ const deleteNote = (id: number) => {
 
 <template>
   <v-list>
-    <v-list-item v-for="note in paginatedClips" :key="clip.id">
+    <v-list-item v-for="note in paginatedClips" :key="note.id">
       <v-list-item-content>
         <v-list-item-title>{{ note.text }}</v-list-item-title>
         <v-list-item-subtitle>{{ note.timestamp }}</v-list-item-subtitle>
+          <v-btn icon @click="deleteNote(note.id)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
       </v-list-item-content>
     </v-list-item>
   </v-list>
