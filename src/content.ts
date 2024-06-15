@@ -1,4 +1,5 @@
 import type { note, noteId } from './types/note'
+import fontColorContrast from 'font-color-contrast'
 
 const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
@@ -9,6 +10,15 @@ const messagesNotes: Map<string, note> = new Map()
 const extractedMessageTexts: Map<Element, string> = new Map()
 let hitCount = 0
 let totalCount = 0
+
+function saveNotes() {
+  const notes = Array.from(messagesNotes.values())
+  const filtered = notes.filter((note) => {
+    return note.text
+  })
+  // console.debug(filtered);
+  // TODO: Send to extension filtered.
+}
 
 function extractMessageText(element: Element) {
   function extractText(element: Element) {
@@ -124,16 +134,16 @@ function getIdByContainer(container: Element): noteId {
   return messageID
 }
 
-function createButton(createNote: () => void) {
+function createButton(action: () => void, content: string) {
   // Create the button element
   const button = document.createElement('button')
 
-  button.innerHTML = '+'
+  button.innerHTML = content
   button.style.width = '24px'
   button.style.height = '24px'
   // add round border
   button.style.border = '2px solid #000'
-  button.style.borderRadius = '25%'
+  button.style.borderRadius = '100%'
   button.style.borderColor = 'black'
   // align font in center
   button.style.textAlign = 'center'
@@ -145,10 +155,10 @@ function createButton(createNote: () => void) {
   button.style.alignItems = 'center'
 
   button.onclick = function () {
-    createNote()
+    action()
   }
 
-  button.style.backgroundColor = 'gray'
+  button.style.backgroundColor = '#F0F2F5'
 
   button.onpointerdown = function () {
     button.style.backgroundColor = 'darkgray'
@@ -171,6 +181,25 @@ function createButton(createNote: () => void) {
 
   return button
 }
+
+// const newShade = (hexColor: string, magnitude: number) => {
+//     hexColor = hexColor.replace(`#`, ``);
+//     if (hexColor.length === 6) {
+//         const decimalColor = parseInt(hexColor, 16);
+//         let r = (decimalColor >> 16) + magnitude;
+//         r > 255 && (r = 255);
+//         r < 0 && (r = 0);
+//         let g = (decimalColor & 0x0000ff) + magnitude;
+//         g > 255 && (g = 255);
+//         g < 0 && (g = 0);
+//         let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
+//         b > 255 && (b = 255);
+//         b < 0 && (b = 0);
+//         return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
+//     } else {
+//         return hexColor;
+//     }
+// };
 
 function createNoteTextarea(onInput: (value: string) => void, color: string | null) {
   const note = document.createElement('textarea')
@@ -306,13 +335,13 @@ function updateUI() {
         return notesDiv
       }
 
-      const existingNoteDiv = container.querySelector('div.notes-container')
+      let existingNoteDiv = container.querySelector('div.notes-container')
       if (!existingNoteDiv) {
         const notesDiv = createNotesDiv()
         innerContainer.appendChild(notesDiv)
       }
 
-      const existingNoteTextarea = container.querySelector('.note-textarea')
+      let existingNoteTextarea = container.querySelector('.note-textarea')
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
           note.text = value
@@ -380,3 +409,5 @@ function observeTargetDiv() {
 window.addEventListener('load', observeTargetDiv)
 
 // TODO: Consider more cases for example what happens when a trap message disappears? What if text changes?
+// TODO: Currently everything is always save. add save button
+// TODO: Load notes from extension on load.
