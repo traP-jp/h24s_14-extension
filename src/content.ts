@@ -2,7 +2,7 @@ const messageContainerClass = "_body_s95f3_1._element_1rhtv_27";
 const targetDivClass = "_container_19vp7_1._mainViewWrapper_1kcg8_28";
 const DEFAULT_COLOR = "#FCBC05";
 
-let messages = new Map();
+const messages = new Map();
 console.log("Defined messages map")
 
 function extractMessageText(element: Element) {
@@ -263,7 +263,7 @@ function updateUI() {
                 note.style.backgroundColor = value;
             }, state.color));
 
-            let existingNoteDiv = container.querySelector('div.notes-container');
+            const existingNoteDiv = container.querySelector('div.notes-container');
             // if (existingNoteDiv && existingNoteDiv.offsetParent === null) {
             //     existingNoteDiv.remove();
             //     existingNoteDiv = null;
@@ -273,7 +273,7 @@ function updateUI() {
                 // console.log("Add new note");
                 innerContainer.appendChild(notesDiv);
             }
-            let existingNoteTextarea = container.querySelector('.note-textarea');
+            const existingNoteTextarea = container.querySelector('.note-textarea');
             if (!existingNoteTextarea && state.note) {
                 const note = createNoteTextarea((value) => {
                     state.note = value;
