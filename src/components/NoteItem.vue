@@ -18,8 +18,29 @@ const deleteNote = (id: noteId) => {
   notes.value = notes.value.filter((note) => note.id !== id)
 }
 
-const editNote = () => {
-  // test
+const editNote = (id: noteId) => {
+  const text = prompt('Enter note text:', note.value.text || '')
+  if (text) {
+    const updatedNotes = notes.value.map(n => {
+      if (n.id === id) {
+        return {
+          ...n,
+          text,
+          creationTimestamp: new Date().toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+        }
+      }
+      return n
+    })
+    notes.value = updatedNotes
+  }
 }
 
 </script>
@@ -27,10 +48,10 @@ const editNote = () => {
 <template>
   <v-list-item-content>
     <v-list-item-title>{{ note.text }}</v-list-item-title>
-    <v-list-item-subtitle>{{ note.color }}</v-list-item-subtitle>
+    <v-list-item-subtitle>{{ note.creationTimestamp }}</v-list-item-subtitle>
     <v-row class="mt-3" align="center" justify="start">
-      <v-btn size="small" variant="outlined" class="mr-2" @click="deleteNote(note.id)">削除</v-btn>
-      <v-btn size="small" variant="outlined" @click="editNote">編集</v-btn>
+      <v-btn size="small" variant="outlined" class="mr-2" @click="deleteNote(note.id)">delete</v-btn>
+      <v-btn size="small" variant="outlined" @click="editNote(note.id)">edit</v-btn>
     </v-row>
   </v-list-item-content>
 </template>
