@@ -241,9 +241,9 @@ notes.value = [
 
 <template>
   <v-list>
-    <v-list-item v-for="note in paginatedNotes" :key="JSON.stringify(note.id)">
+    <div v-for="note in paginatedNotes" :key="JSON.stringify(note.id)">
       <NoteItem :note="note" />
-    </v-list-item>
+    </div>
   </v-list>
   <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
 </template>

@@ -20,11 +20,11 @@ const deleteNote = (id: noteId) => {
 </script>
 
 <template>
-  <v-list-item-content>
+  <v-list-item>
     <v-list-item-title>{{ note.text }}</v-list-item-title>
     <v-list-item-subtitle>{{ note.color }}</v-list-item-subtitle>
     <v-btn variant="tonal" color="primary" @click="deleteNote(note.id)">削除</v-btn>
-  </v-list-item-content>
+  </v-list-item>
 </template>
 
 <style></style>
