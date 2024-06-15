@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PopUp from './components/PopUp.vue'
+</script>
 
 <template>
-  <h1>Hello!!!!</h1>
+  <PopUp />
 </template>
