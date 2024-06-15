@@ -7,7 +7,7 @@ export type noteId = {
 
 export type note = {
   id: noteId
-  text: string
-  color: string
+  text: string | null
+  color: string | null
   creationTimestamp: string
 }
