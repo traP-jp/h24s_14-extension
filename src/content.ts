@@ -1,10 +1,15 @@
 import type { note, noteId } from './types/note'
+import type { note, noteId } from './types/note'
 import fontColorContrast from 'font-color-contrast'
 
 const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
 const DEFAULT_COLOR = '#FCBC05'
+const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
+const targetDivClass = '_viewport_wzi8z_11'
+const DEFAULT_COLOR = '#FCBC05'
 
+let messagesNotes: Map<string, note> = new Map()
 let messagesNotes: Map<string, note> = new Map()
 
 const extractedMessageTexts: Map<Element, string> = new Map()
@@ -157,6 +162,9 @@ function createButton(action: () => void, content: string) {
   button.onclick = function () {
     action()
   }
+  button.onclick = function () {
+    action()
+  }
 
   button.style.backgroundColor = '#F0F2F5'
 
@@ -220,21 +228,6 @@ function createNoteTextarea(onInput: (value: string) => void, color: string | nu
     onInput(note.value)
   }
   return note
-  const note = document.createElement('textarea')
-  note.classList.add('note-textarea')
-  note.style.backgroundColor = color ?? DEFAULT_COLOR
-  note.style.border = '2px solid #977103'
-  note.style.borderRadius = '5px'
-  note.style.padding = '5px'
-  note.style.color = 'white'
-  note.style.minWidth = '100px'
-  note.style.minHeight = '50px'
-  note.style.maxWidth = '300px'
-  note.style.maxHeight = '200px'
-  note.oninput = function () {
-    onInput(note.value)
-  }
-  return note
 }
 
 function createColorPicker(onInput: (value: string) => void, color: string | null) {
@@ -287,92 +280,6 @@ function updateUI() {
   if (!pathContainer) {
     throw new Error('Path container not found')
   }
-
-  const path = extractPath(pathContainer)
-
-  messagesNotes.forEach((note, _) => {
-    const id = note.id
-    // const start = new Date().getTime();
-    const container = getContainerById(id, messageContainers as any as Element[], path)
-    // const end = new Date().getTime();
-    // containerTime += end - start;
-
-    if (container) {
-      const innerContainer = container.querySelector(
-        'div._container_11fv0_1._messageContents_s95f3_27'
-      ) as HTMLElement
-      if (!innerContainer) {
-        throw new Error('Inner container not found')
-      }
-      innerContainer.style.gridTemplateColumns = '42px 1fr 1fr'
-
-      function createNotesDiv() {
-        const notesDiv = document.createElement('div')
-        notesDiv.classList.add('notes-container')
-        notesDiv.style.gridRow = '1 / span 3'
-        notesDiv.style.display = 'flex'
-        notesDiv.style.flexDirection = 'row'
-        notesDiv.style.justifyContent = 'left'
-        notesDiv.style.alignItems = 'top'
-        notesDiv.style.gap = '20px'
-        notesDiv.style.marginLeft = '10px'
-
-        const toolbarDiv = document.createElement('div')
-        toolbarDiv.style.display = 'flex'
-        toolbarDiv.style.flexDirection = 'column'
-        toolbarDiv.style.gap = '10px'
-
-        const addButton = createButton(() => {
-          if (note.text) {
-            return
-          }
-
-          const textarea = createNoteTextarea((value) => {
-            note.text = value
-          }, note.color)
-          note.text = 'new note'
-          textarea.innerHTML = note.text
-          notesDiv.appendChild(textarea)
-          textarea.focus()
-        })
-        toolbarDiv.appendChild(addButton)
-
-        const changeColor = createColorPicker((value) => {
-          const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement
-          if (!textarea) {
-            throw new Error('Note textarea not found')
-          }
-
-          textarea.style.backgroundColor = value
-          note.color = value
-        }, note.color)
-        toolbarDiv.appendChild(changeColor)
-
-        notesDiv.appendChild(toolbarDiv)
-
-        return notesDiv
-      }
-
-      const existingNoteDiv = container.querySelector('div.notes-container')
-      if (!existingNoteDiv) {
-        const notesDiv = createNotesDiv()
-        innerContainer.appendChild(notesDiv)
-      }
-
-      const existingNoteTextarea = container.querySelector('.note-textarea')
-      if (!existingNoteTextarea && note.text) {
-        const textarea = createNoteTextarea((value) => {
-          note.text = value
-        }, note.color)
-        textarea.innerHTML = note.text
-
-        const notesDiv = container.querySelector('div.notes-container') as HTMLElement
-        notesDiv.appendChild(textarea)
-      }
-    }
-  })
-  // print in ms
-  // console.log(`containerTime ${containerTime}ms`);
 
   const path = extractPath(pathContainer)
 
@@ -491,7 +398,6 @@ function updateUI() {
   // print in ms
   // console.log(`containerTime ${containerTime}ms`);
 
-  // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
   // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
 }
 
