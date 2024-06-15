@@ -1,0 +1,6 @@
+{
+  "manifest_version": 3,
+  "name": "h24s_14",
+  "version": "1.0.0",
+  "action": { "default_popup": "index.html" }
+}
