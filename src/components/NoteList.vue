@@ -245,7 +245,7 @@ notes.value = [
       <v-col cols="12">
         <v-list>
           <v-list-item v-for="note in paginatedNotes" :key="JSON.stringify(note.id)" class="note-item">
-            <v-card outlined shaped :elevation="3" :color="note.color" class="mb-s6">
+            <v-card outlined shaped :elevation="3" :color="note.color" class="mb-6">
               <v-card-text>
                 <NoteItem :note="note" />
               </v-card-text>
@@ -260,4 +260,4 @@ notes.value = [
   </v-container>
 </template>
 
-<style scoped></style>
+<style></style>
