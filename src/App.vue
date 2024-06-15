@@ -23,39 +23,32 @@
   </v-app>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, type Ref } from 'vue'
 
 interface Note {
-  id: number;
-  text: string;
-  timestamp: string;
+  id: number
+  text: string
+  timestamp: string
 }
 
-export default defineComponent({
-  data() {
-    return {
-      notes: [] as Note[]
-    };
-  },
-  methods: {
-    createNote() {
-      const text = prompt('Enter note text:');
-      if (text) {
-        const newNote: Note = {
-          id: Date.now(),
-          text: text,
-          timestamp: new Date().toLocaleString()
-        };
-        this.notes.push(newNote);
-      }
-    },
-    deleteNote(id: number) {
-      this.notes = this.notes.filter(note => note.id !== id);
+const notes: Ref<Note[]> = ref([])
+
+const createNote = () => {
+  const text = prompt('Enter note text:')
+  if (text) {
+    const newNote: Note = {
+      id: Date.now(),
+      text: text,
+      timestamp: new Date().toLocaleString()
     }
+    notes.value.push(newNote)
   }
-});
+}
+
+const deleteNote = (id: number) => {
+  notes.value = notes.value.filter((note) => note.id !== id)
+}
 </script>
 
-<style>
-</style>
+<style></style>
