@@ -24,6 +24,7 @@
     "@crxjs/vite-plugin": "^2.0.0-beta.23",
     "@rushstack/eslint-patch": "^1.8.0",
     "@tsconfig/node20": "^20.1.4",
+    "@types/chrome": "^0.0.268",
     "@types/node": "^20.12.5",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^9.0.0",
