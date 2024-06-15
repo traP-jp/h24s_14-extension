@@ -3,17 +3,13 @@
   "name": "h-14 Extension",
   "description": "This is our sample extension",
   "version": "1.0",
-  "permissions": [
-    "activeTab"
-  ],
+  "permissions": ["activeTab", "scripting"],
   "content_scripts": [
     {
-    "matches": [
-        "https://q.trap.jp/*"
-    ],
-    "js": ["content.js"]
+      "matches": ["https://q.trap.jp/*"],
+      "js": ["content.js"]
     }
-],
+  ],
   "action": {
     "default_popup": "index.html"
   }
