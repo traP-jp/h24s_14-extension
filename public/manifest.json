@@ -5,12 +5,14 @@
   "version": "1.0",
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["src/content.ts"]
+    "matches": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "js": ["content.js"]
     }
-  ],
+],
   "action": {
     "default_popup": "index.html"
-  },
-  "permissions": ["activeTab", "scripting"]
+  }
 }
