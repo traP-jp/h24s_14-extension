@@ -5,7 +5,7 @@ const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
 const DEFAULT_COLOR = '#FCBC05'
 
-const messagesNotes: Map<string, note> = new Map()
+let messagesNotes: Map<string, note> = new Map()
 
 const extractedMessageTexts: Map<Element, string> = new Map()
 let hitCount = 0
@@ -165,7 +165,7 @@ function createButton(action: () => void, content: string) {
   }
 
   button.onpointerup = function () {
-    button.style.backgroundColor = 'gray'
+    button.style.backgroundColor = '#F0F2F5'
   }
 
   button.onpointerenter = function () {
@@ -173,7 +173,7 @@ function createButton(action: () => void, content: string) {
   }
 
   button.onpointerleave = function () {
-    button.style.backgroundColor = 'gray'
+    button.style.backgroundColor = '#F0F2F5'
   }
 
   button.style.display = 'flex'
@@ -202,6 +202,24 @@ function createButton(action: () => void, content: string) {
 // };
 
 function createNoteTextarea(onInput: (value: string) => void, color: string | null) {
+  const note = document.createElement('textarea')
+  note.classList.add('note-textarea')
+  note.style.backgroundColor = color ?? DEFAULT_COLOR
+  note.style.color = fontColorContrast(color ?? DEFAULT_COLOR)
+  // // border color is background color but darker
+  // const borderColor = newShade(note.style.backgroundColor, -100);
+  // note.style.border = `2px solid ${borderColor}`;
+  note.style.borderRadius = '5px'
+  note.style.padding = '5px'
+  note.style.minWidth = '100px'
+  note.style.minHeight = '50px'
+  note.style.maxWidth = '300px'
+  note.style.maxHeight = '200px'
+  note.placeholder = 'メモを書いて'
+  note.oninput = function () {
+    onInput(note.value)
+  }
+  return note
   const note = document.createElement('textarea')
   note.classList.add('note-textarea')
   note.style.backgroundColor = color ?? DEFAULT_COLOR
@@ -286,7 +304,7 @@ function updateUI() {
       if (!innerContainer) {
         throw new Error('Inner container not found')
       }
-      innerContainer.style.gridTemplateColumns = '42px 1fr 1fr'
+      innerContainer.style.gridTemplateColumns = '42px 4fr 1fr'
 
       function createNotesDiv() {
         const notesDiv = document.createElement('div')
@@ -312,12 +330,35 @@ function updateUI() {
           const textarea = createNoteTextarea((value) => {
             note.text = value
           }, note.color)
-          note.text = 'new note'
+          note.text = ''
           textarea.innerHTML = note.text
           notesDiv.appendChild(textarea)
           textarea.focus()
-        })
+
+          // addButton.disabled = true;
+          // removeButton.disabled = false;
+          removeButton.style.display = 'flex'
+
+          saveNotes()
+        }, '+')
         toolbarDiv.appendChild(addButton)
+
+        const removeButton = createButton(() => {
+          const noteTextarea = container!.querySelector('.note-textarea') as HTMLElement
+          if (noteTextarea) {
+            noteTextarea.remove()
+
+            messagesNotes.get(JSON.stringify(id))!.text = null
+
+            // addButton.disabled = false;
+            // removeButton.disabled = true;
+            removeButton.style.display = 'none'
+          }
+
+          saveNotes()
+        }, '-')
+        removeButton.style.display = 'none'
+        toolbarDiv.appendChild(removeButton)
 
         const changeColor = createColorPicker((value) => {
           const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement
@@ -326,7 +367,14 @@ function updateUI() {
           }
 
           textarea.style.backgroundColor = value
+          textarea.style.color = fontColorContrast(value)
+
+          // const borderColor = newShade(value, -100);
+          // textarea.style.border = `2px solid ${borderColor}`;
+
           note.color = value
+
+          saveNotes()
         }, note.color)
         toolbarDiv.appendChild(changeColor)
 
@@ -345,6 +393,7 @@ function updateUI() {
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
           note.text = value
+          saveNotes()
         }, note.color)
         textarea.innerHTML = note.text
 
@@ -356,6 +405,7 @@ function updateUI() {
   // print in ms
   // console.log(`containerTime ${containerTime}ms`);
 
+  // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
   // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
 }
 
