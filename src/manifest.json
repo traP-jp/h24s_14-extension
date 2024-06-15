@@ -1,16 +1,16 @@
 {
-    "manifest_version": 3,
-    "name": "h-14 Extension",
-    "description": "This is our sample extension",
-    "version": "1.0",
-    "content_scripts": [
-      {
-        "matches": ["http://*/*", "https://*/*", "file:///*"],
-        "js": ["assets/index-Bgh8LniN.js"]
-      }
-    ],
-    "action": {
-      "default_popup": "index.html",
-      "default_icon": "./favicon.ico"
+  "manifest_version": 3,
+  "name": "h-14 Extension",
+  "description": "This is our sample extension",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*", "file:///*"],
+      "js": ["assets/index-Bgh8LniN.js"]
     }
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "./favicon.ico"
   }
+}
