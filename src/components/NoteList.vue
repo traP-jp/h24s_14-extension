@@ -240,12 +240,24 @@ notes.value = [
 </script>
 
 <template>
-  <v-list>
-    <v-list-item v-for="note in paginatedNotes" :key="JSON.stringify(note.id)">
-      <NoteItem :note="note" />
-    </v-list-item>
-  </v-list>
-  <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <v-list>
+          <v-list-item v-for="note in paginatedNotes" :key="JSON.stringify(note.id)" class="note-item">
+            <v-card :color="note.color" class="mb-3" outlined>
+              <v-card-text>
+                <NoteItem :note="note" />
+              </v-card-text>
+            </v-card>
+          </v-list-item>
+        </v-list>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
+    </v-row>
+  </v-container>
 </template>
 
 <style scoped></style>
