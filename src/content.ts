@@ -1,15 +1,10 @@
 import type { note, noteId } from './types/note'
-import type { note, noteId } from './types/note'
 import fontColorContrast from 'font-color-contrast'
 
 const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
 const DEFAULT_COLOR = '#FCBC05'
-const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
-const targetDivClass = '_viewport_wzi8z_11'
-const DEFAULT_COLOR = '#FCBC05'
 
-let messagesNotes: Map<string, note> = new Map()
 let messagesNotes: Map<string, note> = new Map()
 
 const extractedMessageTexts: Map<Element, string> = new Map()
@@ -162,9 +157,6 @@ function createButton(action: () => void, content: string) {
   button.onclick = function () {
     action()
   }
-  button.onclick = function () {
-    action()
-  }
 
   button.style.backgroundColor = '#F0F2F5'
 
@@ -217,21 +209,6 @@ function createNoteTextarea(onInput: (value: string) => void, color: string | nu
   // // border color is background color but darker
   // const borderColor = newShade(note.style.backgroundColor, -100);
   // note.style.border = `2px solid ${borderColor}`;
-  note.style.borderRadius = '5px'
-  note.style.padding = '5px'
-  note.style.minWidth = '100px'
-  note.style.minHeight = '50px'
-  note.style.maxWidth = '300px'
-  note.style.maxHeight = '200px'
-  note.placeholder = 'メモを書いて'
-  note.oninput = function () {
-    onInput(note.value)
-  }
-  return note
-  const note = document.createElement('textarea')
-  note.classList.add('note-textarea')
-  note.style.backgroundColor = color ?? DEFAULT_COLOR
-  note.style.border = '2px solid #977103'
   note.style.borderRadius = '5px'
   note.style.padding = '5px'
   note.style.minWidth = '100px'
@@ -413,7 +390,6 @@ function updateUI() {
   // print in ms
   // console.log(`containerTime ${containerTime}ms`);
 
-  // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
   // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
 }
 
