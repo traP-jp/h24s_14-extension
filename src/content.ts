@@ -228,6 +228,21 @@ function createNoteTextarea(onInput: (value: string) => void, color: string | nu
     onInput(note.value)
   }
   return note
+  const note = document.createElement('textarea')
+  note.classList.add('note-textarea')
+  note.style.backgroundColor = color ?? DEFAULT_COLOR
+  note.style.border = '2px solid #977103'
+  note.style.borderRadius = '5px'
+  note.style.padding = '5px'
+  note.style.minWidth = '100px'
+  note.style.minHeight = '50px'
+  note.style.maxWidth = '300px'
+  note.style.maxHeight = '200px'
+  note.placeholder = 'メモを書いて'
+  note.oninput = function () {
+    onInput(note.value)
+  }
+  return note
 }
 
 function createColorPicker(onInput: (value: string) => void, color: string | null) {
@@ -398,6 +413,7 @@ function updateUI() {
   // print in ms
   // console.log(`containerTime ${containerTime}ms`);
 
+  // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
   // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
 }
 
