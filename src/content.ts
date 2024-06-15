@@ -11,15 +11,6 @@ const extractedMessageTexts: Map<Element, string> = new Map()
 let hitCount = 0
 let totalCount = 0
 
-function saveNotes() {
-  const notes = Array.from(messagesNotes.values())
-  const filtered = notes.filter((note) => {
-    return note.text
-  })
-  // console.debug(filtered);
-  // TODO: Send to extension filtered.
-}
-
 function extractMessageText(element: Element) {
   function extractText(element: Element) {
     let result = ''
@@ -134,16 +125,16 @@ function getIdByContainer(container: Element): noteId {
   return messageID
 }
 
-function createButton(action: () => void, content: string) {
+function createButton(createNote: () => void) {
   // Create the button element
   const button = document.createElement('button')
 
-  button.innerHTML = content
+  button.innerHTML = '+'
   button.style.width = '24px'
   button.style.height = '24px'
   // add round border
   button.style.border = '2px solid #000'
-  button.style.borderRadius = '100%'
+  button.style.borderRadius = '25%'
   button.style.borderColor = 'black'
   // align font in center
   button.style.textAlign = 'center'
@@ -155,17 +146,17 @@ function createButton(action: () => void, content: string) {
   button.style.alignItems = 'center'
 
   button.onclick = function () {
-    action()
+    createNote()
   }
 
-  button.style.backgroundColor = '#F0F2F5'
+  button.style.backgroundColor = 'gray'
 
   button.onpointerdown = function () {
     button.style.backgroundColor = 'darkgray'
   }
 
   button.onpointerup = function () {
-    button.style.backgroundColor = '#F0F2F5'
+    button.style.backgroundColor = 'gray'
   }
 
   button.onpointerenter = function () {
@@ -173,7 +164,7 @@ function createButton(action: () => void, content: string) {
   }
 
   button.onpointerleave = function () {
-    button.style.backgroundColor = '#F0F2F5'
+    button.style.backgroundColor = 'gray'
   }
 
   button.style.display = 'flex'
@@ -182,44 +173,7 @@ function createButton(action: () => void, content: string) {
   return button
 }
 
-// const newShade = (hexColor: string, magnitude: number) => {
-//     hexColor = hexColor.replace(`#`, ``);
-//     if (hexColor.length === 6) {
-//         const decimalColor = parseInt(hexColor, 16);
-//         let r = (decimalColor >> 16) + magnitude;
-//         r > 255 && (r = 255);
-//         r < 0 && (r = 0);
-//         let g = (decimalColor & 0x0000ff) + magnitude;
-//         g > 255 && (g = 255);
-//         g < 0 && (g = 0);
-//         let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
-//         b > 255 && (b = 255);
-//         b < 0 && (b = 0);
-//         return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
-//     } else {
-//         return hexColor;
-//     }
-// };
-
 function createNoteTextarea(onInput: (value: string) => void, color: string | null) {
-  const note = document.createElement('textarea')
-  note.classList.add('note-textarea')
-  note.style.backgroundColor = color ?? DEFAULT_COLOR
-  note.style.color = fontColorContrast(color ?? DEFAULT_COLOR)
-  // // border color is background color but darker
-  // const borderColor = newShade(note.style.backgroundColor, -100);
-  // note.style.border = `2px solid ${borderColor}`;
-  note.style.borderRadius = '5px'
-  note.style.padding = '5px'
-  note.style.minWidth = '100px'
-  note.style.minHeight = '50px'
-  note.style.maxWidth = '300px'
-  note.style.maxHeight = '200px'
-  note.placeholder = 'メモを書いて'
-  note.oninput = function () {
-    onInput(note.value)
-  }
-  return note
   const note = document.createElement('textarea')
   note.classList.add('note-textarea')
   note.style.backgroundColor = color ?? DEFAULT_COLOR
@@ -304,7 +258,7 @@ function updateUI() {
       if (!innerContainer) {
         throw new Error('Inner container not found')
       }
-      innerContainer.style.gridTemplateColumns = '42px 4fr 1fr'
+      innerContainer.style.gridTemplateColumns = '42px 1fr 1fr'
 
       function createNotesDiv() {
         const notesDiv = document.createElement('div')
@@ -330,35 +284,12 @@ function updateUI() {
           const textarea = createNoteTextarea((value) => {
             note.text = value
           }, note.color)
-          note.text = ''
+          note.text = 'new note'
           textarea.innerHTML = note.text
           notesDiv.appendChild(textarea)
           textarea.focus()
-
-          // addButton.disabled = true;
-          // removeButton.disabled = false;
-          removeButton.style.display = 'flex'
-
-          saveNotes()
-        }, '+')
+        })
         toolbarDiv.appendChild(addButton)
-
-        const removeButton = createButton(() => {
-          const noteTextarea = container!.querySelector('.note-textarea') as HTMLElement
-          if (noteTextarea) {
-            noteTextarea.remove()
-
-            messagesNotes.get(JSON.stringify(id))!.text = null
-
-            // addButton.disabled = false;
-            // removeButton.disabled = true;
-            removeButton.style.display = 'none'
-          }
-
-          saveNotes()
-        }, '-')
-        removeButton.style.display = 'none'
-        toolbarDiv.appendChild(removeButton)
 
         const changeColor = createColorPicker((value) => {
           const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement
@@ -367,14 +298,7 @@ function updateUI() {
           }
 
           textarea.style.backgroundColor = value
-          textarea.style.color = fontColorContrast(value)
-
-          // const borderColor = newShade(value, -100);
-          // textarea.style.border = `2px solid ${borderColor}`;
-
           note.color = value
-
-          saveNotes()
         }, note.color)
         toolbarDiv.appendChild(changeColor)
 
@@ -393,7 +317,6 @@ function updateUI() {
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
           note.text = value
-          saveNotes()
         }, note.color)
         textarea.innerHTML = note.text
 
