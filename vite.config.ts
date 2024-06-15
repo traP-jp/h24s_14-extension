@@ -9,23 +9,11 @@ import { viteStaticCopy } from 'vite-plugin-static-copy'
 export default defineConfig({
   plugins: [
     vue(),
-    ,
     {
       name: 'watch-external', // https://stackoverflow.com/questions/63373804/rollup-watch-include-directory/63548394#63548394
       async buildStart() {
         this.addWatchFile('src/content.ts')
       }
-  plugins: [vue(),     viteStaticCopy({
-    targets: [
-      {
-        src: 'src/content.js',
-        dest: '.'
-      }
-    ]
-  }),         {
-    name: 'watch-external', // https://stackoverflow.com/questions/63373804/rollup-watch-include-directory/63548394#63548394
-    async buildStart(){
-        this.addWatchFile('src/content.js')
     }
   ],
   build: {
@@ -42,7 +30,6 @@ export default defineConfig({
       include: ['src/**']
     }
   },
-}],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
