@@ -5,3 +5,9 @@ import PopUp from './components/PopUp.vue'
 <template>
   <PopUp />
 </template>
+
+<style>
+#app {
+  width: 500px;
+}
+</style>
