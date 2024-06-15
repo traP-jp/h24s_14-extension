@@ -1,4 +1,5 @@
 import type { note, noteId } from "./types/note";
+import fontColorContrast from 'font-color-contrast'
 
 const messageContainerClass = "_body_s95f3_1._element_1rhtv_27";
 const targetDivClass = "_viewport_wzi8z_11";
@@ -9,6 +10,15 @@ let messagesNotes: Map<string, note> = new Map();
 const extractedMessageTexts: Map<Element, string> = new Map();
 let hitCount = 0;
 let totalCount = 0;
+
+function saveNotes() {
+    const notes = Array.from(messagesNotes.values());
+    const filtered = notes.filter((note) => {
+        return note.text;
+    });
+    // console.debug(filtered);
+    // TODO: Send to extension filtered.
+}
 
 function extractMessageText(element: Element) {
     function extractText(element: Element) {
@@ -120,16 +130,16 @@ function getIdByContainer(container: Element): noteId {
     return messageID;
 }
 
-function createButton(createNote: () => void) {
+function createButton(action: () => void, content: string) {
     // Create the button element
     const button = document.createElement('button');
 
-    button.innerHTML = '+';
+    button.innerHTML = content;
     button.style.width = '24px';
     button.style.height = '24px';
     // add round border
     button.style.border = '2px solid #000';
-    button.style.borderRadius = '25%';
+    button.style.borderRadius = '100%';
     button.style.borderColor = 'black';
     // align font in center
     button.style.textAlign = 'center';
@@ -141,17 +151,17 @@ function createButton(createNote: () => void) {
     button.style.alignItems = 'center';
 
     button.onclick = function () {
-        createNote();
+        action();
     }
 
-    button.style.backgroundColor = 'gray';
+    button.style.backgroundColor = '#F0F2F5';
 
     button.onpointerdown = function () {
         button.style.backgroundColor = 'darkgray';
     }
 
     button.onpointerup = function () {
-        button.style.backgroundColor = 'gray';
+        button.style.backgroundColor = '#F0F2F5';
     }
 
     button.onpointerenter = function () {
@@ -159,7 +169,7 @@ function createButton(createNote: () => void) {
     }
 
     button.onpointerleave = function () {
-        button.style.backgroundColor = 'gray';
+        button.style.backgroundColor = '#F0F2F5';
     }
 
     button.style.display = 'flex';
@@ -168,18 +178,41 @@ function createButton(createNote: () => void) {
     return button;
 }
 
+// const newShade = (hexColor: string, magnitude: number) => {
+//     hexColor = hexColor.replace(`#`, ``);
+//     if (hexColor.length === 6) {
+//         const decimalColor = parseInt(hexColor, 16);
+//         let r = (decimalColor >> 16) + magnitude;
+//         r > 255 && (r = 255);
+//         r < 0 && (r = 0);
+//         let g = (decimalColor & 0x0000ff) + magnitude;
+//         g > 255 && (g = 255);
+//         g < 0 && (g = 0);
+//         let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
+//         b > 255 && (b = 255);
+//         b < 0 && (b = 0);
+//         return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
+//     } else {
+//         return hexColor;
+//     }
+// };
+
 function createNoteTextarea(onInput: (value: string) => void, color: string | null) {
+
     const note = document.createElement('textarea');
     note.classList.add('note-textarea');
     note.style.backgroundColor = color ?? DEFAULT_COLOR;
-    note.style.border = '2px solid #977103';
+    note.style.color = fontColorContrast(color ?? DEFAULT_COLOR);
+    // // border color is background color but darker
+    // const borderColor = newShade(note.style.backgroundColor, -100);
+    // note.style.border = `2px solid ${borderColor}`;
     note.style.borderRadius = '5px';
     note.style.padding = '5px';
-    note.style.color = 'white';
     note.style.minWidth = '100px';
     note.style.minHeight = '50px';
     note.style.maxWidth = '300px';
     note.style.maxHeight = '200px';
+    note.placeholder = "メモを書いて";
     note.oninput = function () {
         onInput(note.value);
     }
@@ -251,7 +284,7 @@ function updateUI() {
             if (!innerContainer) {
                 throw new Error('Inner container not found');
             }
-            innerContainer.style.gridTemplateColumns = '42px 1fr 1fr';
+            innerContainer.style.gridTemplateColumns = '42px 4fr 1fr';
 
             function createNotesDiv() {
                 const notesDiv = document.createElement('div');
@@ -277,12 +310,35 @@ function updateUI() {
                     const textarea = createNoteTextarea((value) => {
                         note.text = value;
                     }, note.color);
-                    note.text = "new note";
+                    note.text = "";
                     textarea.innerHTML = note.text;
                     notesDiv.appendChild(textarea);
                     textarea.focus();
-                });
+
+                    // addButton.disabled = true;
+                    // removeButton.disabled = false;
+                    removeButton.style.display = 'flex';
+
+                    saveNotes();
+                }, "+");
                 toolbarDiv.appendChild(addButton);
+
+                const removeButton = createButton(() => {
+                    const noteTextarea = container!.querySelector('.note-textarea') as HTMLElement;
+                    if (noteTextarea) {
+                        noteTextarea.remove();
+
+                        messagesNotes.get(JSON.stringify(id))!.text = null;
+
+                        // addButton.disabled = false;
+                        // removeButton.disabled = true;
+                        removeButton.style.display = 'none';
+                    }
+
+                    saveNotes();
+                }, "-");
+                removeButton.style.display = 'none';
+                toolbarDiv.appendChild(removeButton);
 
                 const changeColor = createColorPicker((value) => {
                     const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement;
@@ -291,7 +347,14 @@ function updateUI() {
                     }
 
                     textarea.style.backgroundColor = value;
+                    textarea.style.color = fontColorContrast(value);
+
+                    // const borderColor = newShade(value, -100);
+                    // textarea.style.border = `2px solid ${borderColor}`;
+
                     note.color = value;
+
+                    saveNotes();
                 }, note.color);
                 toolbarDiv.appendChild(changeColor);
 
@@ -310,6 +373,7 @@ function updateUI() {
             if (!existingNoteTextarea && note.text) {
                 const textarea = createNoteTextarea((value) => {
                     note.text = value;
+                    saveNotes();
                 }, note.color);
                 textarea.innerHTML = note.text;
 
@@ -374,3 +438,5 @@ function observeTargetDiv() {
 window.addEventListener('load', observeTargetDiv);
 
 // TODO: Consider more cases for example what happens when a trap message disappears? What if text changes?
+// TODO: Currently everything is always save. add save button
+// TODO: Load notes from extension on load.
