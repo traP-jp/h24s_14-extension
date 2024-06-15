@@ -1,5 +1,6 @@
 export type note = {
-  messageId: string
+  id: string
   text: string
   color: string
+  timestamp: string
 }
