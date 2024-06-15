@@ -1,25 +1,43 @@
+import type { note, noteId } from "./types/note";
+
 const messageContainerClass = "_body_s95f3_1._element_1rhtv_27";
-const targetDivClass = "_container_19vp7_1._mainViewWrapper_1kcg8_28";
+const targetDivClass = "_viewport_wzi8z_11";
 const DEFAULT_COLOR = "#FCBC05";
 
-const messages = new Map();
-console.log("Defined messages map")
+let messagesNotes: Map<string, note> = new Map();
+
+const extractedMessageTexts: Map<Element, string> = new Map();
+let hitCount = 0;
+let totalCount = 0;
 
 function extractMessageText(element: Element) {
-    let result = '';
+    function extractText(element: Element) {
+        let result = '';
 
-    function traverse(node: any) {
-        if (node.nodeType === Node.TEXT_NODE) {
-            result += node.textContent.trim();
-        } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() !== 'button') {
-            Array.from(node.childNodes).forEach(childNode => {
-                traverse(childNode);
-            });
+        function traverse(node: any) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                result += node.textContent.trim();
+            } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() !== 'button') {
+                Array.from(node.childNodes).forEach(childNode => {
+                    traverse(childNode);
+                });
+            }
         }
+
+        traverse(element);
+        return result;
     }
 
-    traverse(element);
-    return result;
+    totalCount++;
+
+    if (extractedMessageTexts.has(element)) {
+        hitCount++;
+        return extractedMessageTexts.get(element) as string;
+    } else {
+        const text = extractText(element);
+        extractedMessageTexts.set(element, text);
+        return text;
+    }
 }
 
 function extractPath(element: Element) {
@@ -48,64 +66,61 @@ function extractPath(element: Element) {
     return pathParts.join('');
 }
 
-function getContainerById(id) {
+function getContainerById(id: noteId, messageContainers: Element[], path: string): Element | null {
     const { username, time, messageText, channelName } = id;
-    const messageContainers = document.querySelectorAll(`div.${messageContainerClass}`);
     let container = null;
-
-    // console.debug(messages);
 
     messageContainers.forEach((messageContainer) => {
         const innerContainer = messageContainer.querySelector('div._container_11fv0_1._messageContents_s95f3_27');
+        if (!innerContainer) {
+            throw new Error('Inner container not found');
+        }
+
         const usernameElement = innerContainer.querySelector('span._displayName_34zvk_7');
         const timeElement = innerContainer.querySelector('span._date_34zvk_33');
         const messageTextElement = innerContainer.querySelector('span.markdown-body._content_9fzpt_1');
-        const pathContainer = document.querySelector('._container_1w237_1');
-        const path = extractPath(pathContainer);
+        if (!usernameElement || !timeElement || !messageTextElement) {
+            throw new Error('One or more elements not found');
+        }
 
         if (usernameElement.innerHTML === username &&
             timeElement.innerHTML === time &&
             extractMessageText(messageTextElement) === messageText &&
             path === channelName) {
             container = messageContainer;
-        } else {
-            // console.debug("Username", usernameElement.innerHTML, username);
-            // console.debug("Time", timeElement.innerHTML, time);
-            // console.debug("Message text");
-            // console.debug(`${extractMessageText(messageTextElement).length} ||| ${messageText.length}`);
         }
     });
 
     return container;
 }
 
-function getIdByContainer(container) {
+function getIdByContainer(container: Element): noteId {
     const innerContainer = container.querySelector('div._container_11fv0_1._messageContents_s95f3_27');
-    // console.debug(innerContainer);
-    // Find ID information and if not exists add to messages and log
-    const username = innerContainer.querySelector('span._displayName_34zvk_7').innerHTML;
-    // console.debug(username);
-    const time = innerContainer.querySelector('span._date_34zvk_33').innerHTML;
-    // console.debug(time);
-    const messageTextElement = innerContainer.querySelector('span.markdown-body._content_9fzpt_1');
-    const messageText = extractMessageText(messageTextElement);
-    // console.debug(messageText);
-    const pathContainer = document.querySelector('._container_1w237_1');
-    const path = extractPath(pathContainer);
-    const channelName = path;
-    console.debug(channelName);
-    // console.debug(channelName);
+    if (!innerContainer) {
+        throw new Error('Inner container not found');
+    }
 
-    const messageID = {
-        username,
-        time,
+    const username = innerContainer.querySelector('span._displayName_34zvk_7');
+    const time = innerContainer.querySelector('span._date_34zvk_33');
+    const messageTextElement = innerContainer.querySelector('span.markdown-body._content_9fzpt_1');
+    const pathContainer = document.querySelector('._container_1w237_1');
+    if (!username || !time || !messageTextElement || !pathContainer) {
+        throw new Error('One or more elements not found');
+    }
+
+    const messageText = extractMessageText(messageTextElement);
+    const path = extractPath(pathContainer);
+
+    const messageID: noteId = {
+        username: username.innerHTML,
+        time: time.innerHTML,
         messageText,
-        channelName
+        channelName: path
     };
     return messageID;
 }
 
-function button(createNote) {
+function createButton(createNote: () => void) {
     // Create the button element
     const button = document.createElement('button');
 
@@ -153,11 +168,10 @@ function button(createNote) {
     return button;
 }
 
-function createNoteTextarea(onInput, color) {
+function createNoteTextarea(onInput: (value: string) => void, color: string | null) {
     const note = document.createElement('textarea');
     note.classList.add('note-textarea');
     note.style.backgroundColor = color ?? DEFAULT_COLOR;
-    // note.style.resize = 'none';
     note.style.border = '2px solid #977103';
     note.style.borderRadius = '5px';
     note.style.padding = '5px';
@@ -172,8 +186,8 @@ function createNoteTextarea(onInput, color) {
     return note;
 }
 
-function createColorPicker(onInput, color) {
-    function injectColorInputStyles(component) {
+function createColorPicker(onInput: (value: string) => void, color: string | null) {
+    function injectColorInputStyles(component: Element) {
         // Create a new <style> element
         const styleElement = document.createElement('style');
 
@@ -216,107 +230,117 @@ function createColorPicker(onInput, color) {
 }
 
 function updateUI() {
-    console.log('Updating UI...');
-    messages.forEach((state, hash) => {
-        const id = state.id;
-        const container = getContainerById(id);
+    // let containerTime = 0;
+    const messageContainers = document.querySelectorAll(`div.${messageContainerClass}`);
+    const pathContainer = document.querySelector('._container_1w237_1');
+    if (!pathContainer) {
+        throw new Error('Path container not found');
+    }
+
+    const path = extractPath(pathContainer);
+
+    messagesNotes.forEach((note, _) => {
+        const id = note.id;
+        // const start = new Date().getTime();
+        const container = getContainerById(id, messageContainers as any as Element[], path);
+        // const end = new Date().getTime();
+        // containerTime += end - start;
 
         if (container) {
-            const innerContainer = container.querySelector('div._container_11fv0_1._messageContents_s95f3_27');
+            const innerContainer = container.querySelector('div._container_11fv0_1._messageContents_s95f3_27') as HTMLElement;
+            if (!innerContainer) {
+                throw new Error('Inner container not found');
+            }
             innerContainer.style.gridTemplateColumns = '42px 1fr 1fr';
 
-            const notesDiv = document.createElement('div');
-            notesDiv.classList.add('notes-container');
-            // notesDiv.style.background = 'lightgray';
-            notesDiv.style.gridRow = '1 / span 3';
-            notesDiv.style.display = 'flex';
-            notesDiv.style.flexDirection = 'row';
-            notesDiv.style.justifyContent = 'left';
-            notesDiv.style.alignItems = 'top';
-            notesDiv.style.gap = '20px';
-            notesDiv.style.marginLeft = '10px';
+            function createNotesDiv() {
+                const notesDiv = document.createElement('div');
+                notesDiv.classList.add('notes-container');
+                notesDiv.style.gridRow = '1 / span 3';
+                notesDiv.style.display = 'flex';
+                notesDiv.style.flexDirection = 'row';
+                notesDiv.style.justifyContent = 'left';
+                notesDiv.style.alignItems = 'top';
+                notesDiv.style.gap = '20px';
+                notesDiv.style.marginLeft = '10px';
 
-            const toolbarDiv = document.createElement('div');
-            toolbarDiv.style.display = 'flex';
-            toolbarDiv.style.flexDirection = 'column';
-            toolbarDiv.style.gap = '10px';
-            notesDiv.appendChild(toolbarDiv);
+                const toolbarDiv = document.createElement('div');
+                toolbarDiv.style.display = 'flex';
+                toolbarDiv.style.flexDirection = 'column';
+                toolbarDiv.style.gap = '10px';
 
-            toolbarDiv.appendChild(button(() => {
-                if (state.note) {
-                    return;
-                }
-                console.log('Create note');
-                // Create note
-                const note = createNoteTextarea((value) => {
-                    state.note = value;
-                }, state.color);
-                state.note = "new note";
-                note.innerHTML = state.note;
-                notesDiv.appendChild(note);
-                note.focus();
-            }));
+                const addButton = createButton(() => {
+                    if (note.text) {
+                        return;
+                    }
 
-            toolbarDiv.appendChild(createColorPicker((value) => {
-                state.color = value;
-                const note = notesDiv.querySelector('.note-textarea');
-                note.style.backgroundColor = value;
-            }, state.color));
+                    const textarea = createNoteTextarea((value) => {
+                        note.text = value;
+                    }, note.color);
+                    note.text = "new note";
+                    textarea.innerHTML = note.text;
+                    notesDiv.appendChild(textarea);
+                    textarea.focus();
+                });
+                toolbarDiv.appendChild(addButton);
 
-            const existingNoteDiv = container.querySelector('div.notes-container');
-            // if (existingNoteDiv && existingNoteDiv.offsetParent === null) {
-            //     existingNoteDiv.remove();
-            //     existingNoteDiv = null;
-            //     console.log("Remove existing note");
-            // }
+                const changeColor = createColorPicker((value) => {
+                    const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement;
+                    if (!textarea) {
+                        throw new Error('Note textarea not found');
+                    }
+
+                    textarea.style.backgroundColor = value;
+                    note.color = value;
+                }, note.color);
+                toolbarDiv.appendChild(changeColor);
+
+                notesDiv.appendChild(toolbarDiv);
+
+                return notesDiv;
+            }
+
+
+            let existingNoteDiv = container.querySelector('div.notes-container');
             if (!existingNoteDiv) {
-                // console.log("Add new note");
+                const notesDiv = createNotesDiv();
                 innerContainer.appendChild(notesDiv);
             }
-            const existingNoteTextarea = container.querySelector('.note-textarea');
-            if (!existingNoteTextarea && state.note) {
-                const note = createNoteTextarea((value) => {
-                    state.note = value;
-                }, state.color);
-                note.innerHTML = state.note;
-                notesDiv.appendChild(note);
-            }
 
-            // console.debug(messages);
+
+            let existingNoteTextarea = container.querySelector('.note-textarea');
+            if (!existingNoteTextarea && note.text) {
+                const textarea = createNoteTextarea((value) => {
+                    note.text = value;
+                }, note.color);
+                textarea.innerHTML = note.text;
+
+                const notesDiv = container.querySelector('div.notes-container') as HTMLElement;
+                notesDiv.appendChild(textarea);
+
+            }
         }
     });
+    // print in ms
+    // console.log(`containerTime ${containerTime}ms`);
+
+    // console.log(`hitCount: ${hitCount} / totalCount: ${totalCount} and in percent: ${hitCount / totalCount * 100}%`)
 }
 
-/*
-Information that identifies a message as unique:
-- Username
-- Time
-- Message text
-- Full channel name
-*/
-
 function findMessages() {
-    const messageContainers = document.querySelectorAll(`div.${messageContainerClass}`);
-
-    let newMessages = 0;
-    messageContainers.forEach((container) => {
+    document.querySelectorAll(`div.${messageContainerClass}`).forEach((container) => {
         const messageID = getIdByContainer(container);
         const idString = JSON.stringify(messageID);
-        // Map message ID to DOM node messageContainer but only if it doesn't exist
-        if (!messages.has(idString)) {
-            const state = {
+        if (!messagesNotes.has(idString)) {
+            const n: note = {
                 id: messageID,
-                note: null,
-                color: null
+                text: null,
+                color: null,
+                creationTimestamp: new Date().toISOString()
             };
-            messages.set(idString, state);
-            // console.log(`Added message ${messageID} to messages map`);
-            newMessages++;
+            messagesNotes.set(idString, n);
         }
     });
-
-    console.log(`Found ${newMessages} new messages`);
-    // console.debug(messages);
 }
 
 function observeTargetDiv() {
@@ -326,9 +350,13 @@ function observeTargetDiv() {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList' || mutation.type === 'characterData') {
-                    console.log('Target div updated. Finding messages...');
+                    // measure time
+                    // console.time('findMessages');
                     findMessages();
+                    // console.timeEnd('findMessages');
+                    // console.time('updateUI');
                     updateUI();
+                    // console.timeEnd('updateUI');
                 }
             });
         });
@@ -341,10 +369,11 @@ function observeTargetDiv() {
 
         observer.observe(targetDiv, observerOptions);
     } else {
-        console.warn('Target div not found. Retrying in 0.5 seconds...');
         setTimeout(observeTargetDiv, 500);
     }
 }
 
 // Start observing the target div when the page loads
 window.addEventListener('load', observeTargetDiv);
+
+// TODO: Consider more cases for example what happens when a trap message disappears? What if text changes?
