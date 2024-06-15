@@ -1,5 +1,13 @@
+export type noteId = {
+  username: string
+  time: string
+  messageText: string
+  channelName: string
+}
+
 export type note = {
-  messageId: string
+  id: noteId
   text: string
   color: string
+  creationTimestamp: string
 }
