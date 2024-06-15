@@ -5,7 +5,7 @@ const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
 const DEFAULT_COLOR = '#FCBC05'
 
-let messagesNotes: Map<string, note> = new Map()
+const messagesNotes: Map<string, note> = new Map()
 
 const extractedMessageTexts: Map<Element, string> = new Map()
 let hitCount = 0
@@ -368,13 +368,13 @@ function updateUI() {
         return notesDiv
       }
 
-      let existingNoteDiv = container.querySelector('div.notes-container')
+      const existingNoteDiv = container.querySelector('div.notes-container')
       if (!existingNoteDiv) {
         const notesDiv = createNotesDiv()
         innerContainer.appendChild(notesDiv)
       }
 
-      let existingNoteTextarea = container.querySelector('.note-textarea')
+      const existingNoteTextarea = container.querySelector('.note-textarea')
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
           note.text = value
