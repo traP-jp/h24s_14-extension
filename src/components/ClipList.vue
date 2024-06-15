@@ -44,9 +44,7 @@ const deleteNote = (id: number) => {
       <v-list-item-content>
         <v-list-item-title>{{ note.text }}</v-list-item-title>
         <v-list-item-subtitle>{{ note.timestamp }}</v-list-item-subtitle>
-          <v-btn icon @click="deleteNote(note.id)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+        <v-btn variant = "tonal" color = "primary" @click="deleteNote(note.id)">削除</v-btn>
       </v-list-item-content>
     </v-list-item>
   </v-list>
