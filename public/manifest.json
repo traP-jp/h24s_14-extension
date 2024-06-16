@@ -4,14 +4,18 @@
   "description": "This is our sample extension",
   "version": "1.0",
   "permissions": [
+    "storage",
     "activeTab"
   ],
+    "background": {
+      "service_worker": "background.js"
+    },
   "content_scripts": [
     {
     "matches": [
         "https://q.trap.jp/*"
     ],
-    "js": ["content.js"]
+    "js": ["test.js"]
     }
 ],
   "action": {
