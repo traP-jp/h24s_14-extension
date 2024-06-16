@@ -11,3 +11,9 @@ onMounted(() => notesStore.getNotesFromSyncStorage())
 <template>
   <PopUp />
 </template>
+
+<style>
+#app {
+  width: 500px;
+}
+</style>
