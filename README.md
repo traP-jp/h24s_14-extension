@@ -13,7 +13,7 @@ npm install
 ターミナルで
 
 ```sh
-npm run dev
+npm run build
 ```
 
 を実行すると`dist`というディレクトリができる
