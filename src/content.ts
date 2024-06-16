@@ -5,19 +5,24 @@ const messageContainerClass = '_body_s95f3_1._element_1rhtv_27'
 const targetDivClass = '_viewport_wzi8z_11'
 const DEFAULT_COLOR = '#FCBC05'
 
-const messagesNotes: Map<string, note> = new Map()
+let messagesNotes: Map<string, note> = new Map()
 
 const extractedMessageTexts: Map<Element, string> = new Map()
 let hitCount = 0
 let totalCount = 0
 
 function saveNotes() {
+  console.log('Save')
   const notes = Array.from(messagesNotes.values())
   const filtered = notes.filter((note) => {
     return note.text
   })
-  // console.debug(filtered);
-  // TODO: Send to extension filtered.
+  console.debug(filtered)
+
+  // save filtered in local storage
+  chrome.storage.sync.set({ data: filtered }, function () {
+    console.log('Saved', filtered)
+  })
 }
 
 function extractMessageText(element: Element) {
@@ -289,7 +294,7 @@ function updateUI() {
       if (!innerContainer) {
         throw new Error('Inner container not found')
       }
-      innerContainer.style.gridTemplateColumns = '42px 4fr 1fr'
+      innerContainer.style.gridTemplateColumns = '42px 2fr 1fr'
 
       function createNotesDiv() {
         const notesDiv = document.createElement('div')
@@ -368,15 +373,16 @@ function updateUI() {
         return notesDiv
       }
 
-      const existingNoteDiv = container.querySelector('div.notes-container')
+      let existingNoteDiv = container.querySelector('div.notes-container')
       if (!existingNoteDiv) {
         const notesDiv = createNotesDiv()
         innerContainer.appendChild(notesDiv)
       }
 
-      const existingNoteTextarea = container.querySelector('.note-textarea')
+      let existingNoteTextarea = container.querySelector('.note-textarea')
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
+          console.log('input')
           note.text = value
           saveNotes()
         }, note.color)
@@ -410,6 +416,12 @@ function findMessages() {
 }
 
 function observeTargetDiv() {
+  chrome.storage.sync.get('data', function (result) {
+    console.log('Loaded', result.data)
+    // transform note array to messsagesNotes mpa
+    messagesNotes = new Map(result.data.map((note: note) => [JSON.stringify(note.id), note]))
+  })
+
   const targetDiv = document.querySelector(`div.${targetDivClass}`)
 
   if (targetDiv) {
@@ -444,4 +456,4 @@ window.addEventListener('load', observeTargetDiv)
 
 // TODO: Consider more cases for example what happens when a trap message disappears? What if text changes?
 // TODO: Currently everything is always save. add save button
-// TODO: Load notes from extension on load.
+// TODO: better design
