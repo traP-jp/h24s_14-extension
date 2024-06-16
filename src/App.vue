@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useTestStore } from './store/testStore';
+import { storeToRefs } from 'pinia'
+import { useTestStore } from './store/testStore'
 import PopUp from './components/PopUp.vue'
 
 const testStore = useTestStore()
@@ -15,4 +15,4 @@ const onBtnClicked = () => {
   <h1>{{ text }}</h1>
   <btn :onclick="onBtnClicked">click!</btn>
   <PopUp />
-</script>
+</template>
