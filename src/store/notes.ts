@@ -6,7 +6,7 @@ export const useNotesStore = defineStore('notes', () => {
   const notes = ref<note[]>([])
 
   const getNotesFromLocalStorage = () => {
-    chrome.storage.local.get('data', (value) => {
+    chrome.storage.sync.get('data', (value) => {
       notes.value = value.data
     })
   }

@@ -12,12 +12,17 @@ let hitCount = 0;
 let totalCount = 0;
 
 function saveNotes() {
+    console.log("Save")
     const notes = Array.from(messagesNotes.values());
     const filtered = notes.filter((note) => {
-        return note.text;
+        return note.text !== null;
     });
-    // console.debug(filtered);
-    // TODO: Send to extension filtered.
+    console.debug(filtered);
+
+    // save filtered in local storage
+    chrome.storage.sync.set({ data: filtered }, function () {
+        console.log("Saved", filtered)
+    });
 }
 
 function extractMessageText(element: Element) {
@@ -130,16 +135,20 @@ function getIdByContainer(container: Element): noteId {
     return messageID;
 }
 
-function createButton(action: () => void, content: string) {
+function createButton(action: () => void, icon: string) {
     // Create the button element
     const button = document.createElement('button');
 
-    button.innerHTML = content;
+    button.innerHTML = `
+    <span class="material-symbols-outlined" style="font-size: 16px;">
+      ${icon}
+    </span>
+  `;
     button.style.width = '24px';
     button.style.height = '24px';
     // add round border
     button.style.border = '2px solid #000';
-    button.style.borderRadius = '100%';
+    button.style.borderRadius = '5px';
     button.style.borderColor = 'black';
     // align font in center
     button.style.textAlign = 'center';
@@ -284,7 +293,7 @@ function updateUI() {
             if (!innerContainer) {
                 throw new Error('Inner container not found');
             }
-            innerContainer.style.gridTemplateColumns = '42px 4fr 1fr';
+            innerContainer.style.gridTemplateColumns = '42px 2fr 1fr';
 
             function createNotesDiv() {
                 const notesDiv = document.createElement('div');
@@ -309,8 +318,9 @@ function updateUI() {
 
                     const textarea = createNoteTextarea((value) => {
                         note.text = value;
+                        saveButtonRef.style.display = 'flex';
                     }, note.color);
-                    note.text = "";
+                    note.text = "メモ";
                     textarea.innerHTML = note.text;
                     notesDiv.appendChild(textarea);
                     textarea.focus();
@@ -320,7 +330,7 @@ function updateUI() {
                     removeButton.style.display = 'flex';
 
                     saveNotes();
-                }, "+");
+                }, "add");
                 toolbarDiv.appendChild(addButton);
 
                 const removeButton = createButton(() => {
@@ -336,21 +346,16 @@ function updateUI() {
                     }
 
                     saveNotes();
-                }, "-");
-                removeButton.style.display = 'none';
+                }, "remove");
+                removeButton.style.display = note.text ? 'flex' : 'none';
                 toolbarDiv.appendChild(removeButton);
 
                 const changeColor = createColorPicker((value) => {
                     const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement;
-                    if (!textarea) {
-                        throw new Error('Note textarea not found');
+                    if (textarea) {
+                        textarea.style.backgroundColor = value;
+                        textarea.style.color = fontColorContrast(value);
                     }
-
-                    textarea.style.backgroundColor = value;
-                    textarea.style.color = fontColorContrast(value);
-
-                    // const borderColor = newShade(value, -100);
-                    // textarea.style.border = `2px solid ${borderColor}`;
 
                     note.color = value;
 
@@ -358,14 +363,27 @@ function updateUI() {
                 }, note.color);
                 toolbarDiv.appendChild(changeColor);
 
+                const saveButton = createButton(() => {
+                    saveNotes();
+                    saveButton.style.display = 'none';
+                }, "save");
+                saveButton.style.display = 'none';
+                toolbarDiv.appendChild(saveButton);
+
                 notesDiv.appendChild(toolbarDiv);
 
-                return notesDiv;
+                return {
+                    notesDiv,
+                    saveButton
+                }
             }
+
+            let saveButtonRef: HTMLElement;
 
             let existingNoteDiv = container.querySelector('div.notes-container');
             if (!existingNoteDiv) {
-                const notesDiv = createNotesDiv();
+                const { notesDiv, saveButton } = createNotesDiv();
+                saveButtonRef = saveButton;
                 innerContainer.appendChild(notesDiv);
             }
 
@@ -373,7 +391,7 @@ function updateUI() {
             if (!existingNoteTextarea && note.text) {
                 const textarea = createNoteTextarea((value) => {
                     note.text = value;
-                    saveNotes();
+                    saveButtonRef.style.display = 'flex';
                 }, note.color);
                 textarea.innerHTML = note.text;
 
@@ -405,6 +423,12 @@ function findMessages() {
 }
 
 function observeTargetDiv() {
+    chrome.storage.sync.get('data', function (result) {
+        console.log("Loaded", result.data)
+        // transform note array to messsagesNotes mpa
+        messagesNotes = new Map(result.data.map((note: note) => [JSON.stringify(note.id), note]));
+    });
+
     const targetDiv = document.querySelector(`div.${targetDivClass}`);
 
     if (targetDiv) {
@@ -437,6 +461,11 @@ function observeTargetDiv() {
 // Start observing the target div when the page loads
 window.addEventListener('load', observeTargetDiv);
 
-// TODO: Consider more cases for example what happens when a trap message disappears? What if text changes?
-// TODO: Currently everything is always save. add save button
-// TODO: Load notes from extension on load.
+function insertStylesheet() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0';
+    document.head.appendChild(link);
+}
+
+insertStylesheet();

@@ -3,6 +3,7 @@
   "name": "h-14 Extension",
   "description": "This is our sample extension",
   "version": "1.0",
+<<<<<<< HEAD
   "permissions": [
     "storage",
     "activeTab"
@@ -10,6 +11,9 @@
     "background": {
       "service_worker": "background.js"
     },
+=======
+  "permissions": ["activeTab", "scripting", "storage"],
+>>>>>>> b6c9cdfdf2e6ca9c3be4816dcf659647a99f183e
   "content_scripts": [
     {
     "matches": [

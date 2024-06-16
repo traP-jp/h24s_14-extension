@@ -5,7 +5,7 @@ export const useTestStore = defineStore('test', () => {
   const text = ref<string>('Hello')
 
   const getTextFromLocalStorage = () => {
-    chrome.storage.local.get('data', (value) => {
+    chrome.storage.sync.get('data', (value) => {
       text.value = value.data
     })
   }
