@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import PopUp from './components/PopUp.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <PopUp />
+  This is the app
+  <RouterView />
 </template>
 
 <style>
