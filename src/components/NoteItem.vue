@@ -17,16 +17,25 @@ const { notes } = storeToRefs(useNotesStore())
 const deleteNote = (id: noteId) => {
   notes.value = notes.value.filter((note) => note.id !== id)
 }
+const backgroundColor = computed(() => (note.value.color ? note.value.color : 'success'))
 </script>
 
 <template>
-  <v-card :color="note.color ? note.color : 'white'">
+  <v-card :color="backgroundColor" class="mx-4 my-2">
     <v-card-item>
       <v-card-title>{{ note.text }}</v-card-title>
-      <v-card-subtitle>{{ note.id.username }} {{ note.id.channelName }}</v-card-subtitle>
-      <v-card-text>{{ note.id.messageText }}</v-card-text>
+      <v-card-subtitle>
+        <div>{{ note.id.username }} {{ note.id.channelName }}</div>
+        <div>{{ note.id.messageText }}</div>
+      </v-card-subtitle>
       <template #append>
-        <v-btn icon="mdi-delete" flat @click="deleteNote(note.id)"></v-btn>
+        <v-btn
+          :color="backgroundColor"
+          icon="mdi-delete"
+          flat
+          text="true"
+          @click="deleteNote(note.id)"
+        ></v-btn>
       </template>
     </v-card-item>
   </v-card>
