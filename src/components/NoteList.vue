@@ -15,23 +15,6 @@ const paginatedNotes = computed(() => {
   const end = start + noteLintLength
   return notes.value.slice(start, end)
 })
-
-const generateNote = (index: number): note => {
-  const timestamp = new Date(2024, 5, 15 + Math.floor(index / 24), index % 24).toISOString()
-  return {
-    id: {
-      username: `user${index + 1}`,
-      time: timestamp,
-      messageText: `MessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessage ${index + 1}`,
-      channelName: `#event/hackathon/24spring/14`
-    },
-    text: `NoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNote ${index + 1}.`,
-    color: ['red', 'blue', 'green', 'yellow', 'purple', 'black', 'white', null][index % 8],
-    creationTimestamp: timestamp
-  }
-}
-
-notes.value = Array.from({ length: 100 }, (_, index) => generateNote(index))
 </script>
 
 <template>
