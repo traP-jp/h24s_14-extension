@@ -323,8 +323,9 @@ function updateUI() {
 
           const textarea = createNoteTextarea((value) => {
             note.text = value
+            saveButtonRef.style.display = 'flex'
           }, note.color)
-          note.text = ''
+          note.text = 'メモ'
           textarea.innerHTML = note.text
           notesDiv.appendChild(textarea)
           textarea.focus()
@@ -334,7 +335,7 @@ function updateUI() {
           removeButton.style.display = 'flex'
 
           saveNotes()
-        }, '+')
+        }, 'add')
         toolbarDiv.appendChild(addButton)
 
         const removeButton = createButton(() => {
@@ -350,21 +351,16 @@ function updateUI() {
           }
 
           saveNotes()
-        }, '-')
-        removeButton.style.display = 'none'
+        }, 'remove')
+        removeButton.style.display = note.text ? 'flex' : 'none'
         toolbarDiv.appendChild(removeButton)
 
         const changeColor = createColorPicker((value) => {
           const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement
-          if (!textarea) {
-            throw new Error('Note textarea not found')
+          if (textarea) {
+            textarea.style.backgroundColor = value
+            textarea.style.color = fontColorContrast(value)
           }
-
-          textarea.style.backgroundColor = value
-          textarea.style.color = fontColorContrast(value)
-
-          // const borderColor = newShade(value, -100);
-          // textarea.style.border = `2px solid ${borderColor}`;
 
           note.color = value
 
@@ -372,23 +368,35 @@ function updateUI() {
         }, note.color)
         toolbarDiv.appendChild(changeColor)
 
+        const saveButton = createButton(() => {
+          saveNotes()
+          saveButton.style.display = 'none'
+        }, 'save')
+        saveButton.style.display = 'none'
+        toolbarDiv.appendChild(saveButton)
+
         notesDiv.appendChild(toolbarDiv)
 
-        return notesDiv
+        return {
+          notesDiv,
+          saveButton
+        }
       }
 
-      let existingNoteDiv = container.querySelector('div.notes-container')
+      let saveButtonRef: HTMLElement
+
+      const existingNoteDiv = container.querySelector('div.notes-container')
       if (!existingNoteDiv) {
-        const notesDiv = createNotesDiv()
+        const { notesDiv, saveButton } = createNotesDiv()
+        saveButtonRef = saveButton
         innerContainer.appendChild(notesDiv)
       }
 
-      let existingNoteTextarea = container.querySelector('.note-textarea')
+      const existingNoteTextarea = container.querySelector('.note-textarea')
       if (!existingNoteTextarea && note.text) {
         const textarea = createNoteTextarea((value) => {
-          console.log('input')
           note.text = value
-          saveNotes()
+          saveButtonRef.style.display = 'flex'
         }, note.color)
         textarea.innerHTML = note.text
 
