@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/valid-v-else -->
 <script setup lang="ts">
 import type { note as Note, noteId } from '@/types/note'
 import { storeToRefs } from 'pinia'
@@ -57,20 +58,14 @@ const editNote = (id: noteId) => {
     <template v-slot:append>
       <v-fade-transition mode="in-out">
         <v-col class="d-flex justify-end">
-          <v-row class="mt-3" v-if="state.confirmDelete">
-            <v-btn size="small" variant="outlined" class="mr-2" @click="deleteNote(note.id)">Yes</v-btn>
-            <v-btn size="small" variant="outlined" @click="state.confirmDelete = false">No</v-btn>
+          <v-row class="mt-3 justify-end">
+            <v-btn size="small" variant="outlined" class="mr-3" v-if="state.confirmDelete" @click="deleteNote(note.id)">No</v-btn>
+            <v-btn size="small" variant="outlined" v-if="state.confirmDelete" @click="state.confirmDelete = false">Yes</v-btn>
+            <v-btn size="small" variant="outlined" class="mr-3" v-if = "!state.confirmDelete" @click="state.confirmDelete = true">削除</v-btn>
+            <v-btn size="small" variant="outlined" v-if = "!state.confirmDelete" @click="editNote(note.id)">編集</v-btn>
           </v-row>
         </v-col>
       </v-fade-transition>
-      <v-transition mode="in-out">
-        <v-col class="d-flex justify-end">
-          <v-row class="mt-3" v-if="!state.confirmDelete">
-            <v-btn size="small" variant="outlined" class="mr-2" @click="state.confirmDelete = true">削除</v-btn>
-            <v-btn size="small" variant="outlined" @click="editNote(note.id)">編集</v-btn>
-          </v-row>
-        </v-col>
-      </v-transition>
     </template>
   </v-list-item>
 </template>
