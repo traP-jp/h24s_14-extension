@@ -17,7 +17,7 @@
     ],
     "js": ["test.js"]
     }
-],
+  ],
   "action": {
     "default_popup": "index.html"
   }
