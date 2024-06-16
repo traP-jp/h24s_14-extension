@@ -17,8 +17,8 @@ export const useNotesStore = defineStore('notes', () => {
       method: 'edit',
       content: content
     }
-    chrome.tabs.getCurrent(function (tab) {
-      chrome.tabs.sendMessage(tab.id, message)
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tab) {
+      chrome.tabs.sendMessage(tab[0].id, message)
     })
   }
 
@@ -27,8 +27,8 @@ export const useNotesStore = defineStore('notes', () => {
       method: 'delete',
       content: content
     }
-    chrome.tabs.getCurrent(function (tab) {
-      chrome.tabs.sendMessage(tab.id, message)
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tab) {
+      chrome.tabs.sendMessage(tab[0].id, message)
     })
   }
 

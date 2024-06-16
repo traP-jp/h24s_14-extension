@@ -15,7 +15,7 @@ const noteStore = useNotesStore()
 
 const deleteNote = (note: Note) => {
   noteStore.DeleteNoteOnContentScript(note)
-  noteStore.getNotesFromSyncStorage()
+  setTimeout(() => noteStore.getNotesFromSyncStorage(), 500)
 }
 const backgroundColor = computed(() => (note.value.color ? note.value.color : 'success'))
 
@@ -28,7 +28,7 @@ const editNote = (note: Note) => {
   if (text) {
     const newNote = { ...note, text }
     noteStore.editNoteOnContentScript(newNote)
-    noteStore.getNotesFromSyncStorage()
+    setTimeout(() => noteStore.getNotesFromSyncStorage(), 500)
   }
 }
 </script>
