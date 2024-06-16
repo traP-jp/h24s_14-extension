@@ -35,12 +35,15 @@ notes.value = Array.from({ length: 100 }, (_, index) => generateNote(index))
 </script>
 
 <template>
-  <v-list color="success">
-    <div v-for="note in paginatedNotes" :key="JSON.stringify(note.id)">
-      <NoteItem :note="note" />
-    </div>
-  </v-list>
-  <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
+  <div v-if="notes.length > 0">
+    <v-list color="success">
+      <div v-for="note in paginatedNotes" :key="JSON.stringify(note.id)">
+        <NoteItem :note="note" />
+      </div>
+    </v-list>
+    <v-pagination v-model="currentPage" :length="paginationLength"></v-pagination>
+  </div>
+  <v-alert v-else>付箋がありません</v-alert>
 </template>
 
 <style scoped></style>
