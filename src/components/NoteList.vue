@@ -3,7 +3,6 @@ import { storeToRefs } from 'pinia'
 import { ref, computed } from 'vue'
 import { useNotesStore } from '@/store/notes'
 import NoteItem from './NoteItem.vue'
-import type { note } from '@/types/note'
 
 const currentPage = ref(1)
 const noteLintLength = 5
