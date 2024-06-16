@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { note as Note, noteId } from '@/types/note'
-import { storeToRefs } from 'pinia'
+import type { note as Note } from '@/types/note'
 import { useNotesStore } from '@/store/notes'
 import { computed, type Ref } from 'vue'
 
@@ -12,10 +11,10 @@ const props = defineProps({
 })
 const note: Ref<Note> = computed(() => ({ ...props.note }))
 
-const { notes } = storeToRefs(useNotesStore())
+const noteStore = useNotesStore()
 
-const deleteNote = (id: noteId) => {
-  notes.value = notes.value.filter((note) => note.id !== id)
+const deleteNote = (note: Note) => {
+  noteStore.DeleteNoteOnContentScript(note)
 }
 const backgroundColor = computed(() => (note.value.color ? note.value.color : 'success'))
 
@@ -33,11 +32,11 @@ const channelUrl = computed(() => {
     <v-card-item>
       <v-card-title>{{ note.text }}</v-card-title>
       <v-card-subtitle>
-        <div>{{ note.id.username }} {{ note.id.channelName }}</div>
+        <div><v-icon>mdi-delete</v-icon> {{ note.id.username }} {{ note.id.channelName }}</div>
         <div>{{ note.id.messageText }}</div>
       </v-card-subtitle>
       <template #append>
-        <v-btn :color="backgroundColor" icon="mdi-delete" flat @click="deleteNote(note.id)"></v-btn>
+        <v-btn :color="backgroundColor" icon="mdi-delete" flat @click="deleteNote(note)"></v-btn>
       </template>
     </v-card-item>
   </v-card>
