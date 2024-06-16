@@ -5,5 +5,11 @@ import type { note } from '@/types/note'
 export const useNotesStore = defineStore('notes', () => {
   const notes = ref<note[]>([])
 
-  return { notes }
+  const getNotesFromLocalStorage = () => {
+    chrome.storage.local.get('data', (value) => {
+      notes.value = value.data
+    })
+  }
+
+  return { notes, getNotesFromLocalStorage }
 })

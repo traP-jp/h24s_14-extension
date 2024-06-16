@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { storeToRefs } from "pinia";
+import { useTestStore } from './store/testStore';
 import PopUp from './components/PopUp.vue'
 
-const onBtnClicked = async () => {
-  const val = await chrome.storage.local.get('data')
-  text.value = val.data
+const testStore = useTestStore()
+const { text } = storeToRefs(testStore)
+
+const onBtnClicked = () => {
+  testStore.getTextFromLocalStorage()
 }
-const text = ref<string>('Hello!')
 </script>
 
 <template>
