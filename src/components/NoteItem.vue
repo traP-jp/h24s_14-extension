@@ -21,9 +21,12 @@ const deleteNote = (id: noteId) => {
 
 <template>
   <v-list-item>
+    <template #prepend>{{ note.color }}</template>
     <v-list-item-title>{{ note.text }}</v-list-item-title>
-    <v-list-item-subtitle>{{ note.color }}</v-list-item-subtitle>
-    <v-btn variant="tonal" color="primary" @click="deleteNote(note.id)">削除</v-btn>
+    <v-list-item-subtitle>{{ note.id.messageText }}</v-list-item-subtitle>
+    <template #append>
+      <v-btn icon="mdi-delete" @click="deleteNote(note.id)"></v-btn>
+    </template>
   </v-list-item>
 </template>
 
