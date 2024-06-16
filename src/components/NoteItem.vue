@@ -26,8 +26,7 @@ const editNote = (id: noteId) => {
       if (n.id === id) {
         return {
           ...n,
-          text,
-          creationTimestamp: new Date().toString()
+          text
         }
       }
       return n
