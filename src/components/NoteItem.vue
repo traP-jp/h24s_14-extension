@@ -41,7 +41,7 @@ const editNote = (note: Note) => {
         <v-scroll-y-reverse-transition mode="out-in">
           <div v-if="state.confirmDelete" class="text-caption">本当に削除しますか?</div>
           <div v-else class="text-caption">
-            <div><v-icon>mdi-delete</v-icon> {{ note.id.username }} {{ note.id.channelName }}</div>
+            <div>{{ note.id.username }} {{ note.id.channelName }}</div>
             <div>{{ note.id.messageText }}</div>
           </div>
         </v-scroll-y-reverse-transition>
