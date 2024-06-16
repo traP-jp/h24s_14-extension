@@ -3,6 +3,8 @@ import type { note as Note } from '@/types/note'
 import { useNotesStore } from '@/store/notes'
 import { computed, reactive, type Ref } from 'vue'
 
+const DEFAULT_COLOR = '#FCBC05'
+
 const props = defineProps({
   note: {
     type: Object as () => Note,
@@ -17,7 +19,7 @@ const deleteNote = (note: Note) => {
   noteStore.DeleteNoteOnContentScript(note)
   setTimeout(() => noteStore.getNotesFromSyncStorage(), 500)
 }
-const backgroundColor = computed(() => (note.value.color ? note.value.color : 'success'))
+const backgroundColor = computed(() => (note.value.color ? note.value.color : DEFAULT_COLOR))
 
 const state = reactive({
   confirmDelete: false
@@ -51,34 +53,14 @@ const editNote = (note: Note) => {
           <v-col class="d-flex justify-end">
             <v-row class="mt-3 justify-end">
               <div v-if="state.confirmDelete">
-                <v-btn
-                  icon="mdi-close"
-                  size="small"
-                  variant="outlined"
-                  class="mr-3"
-                  @click="state.confirmDelete = false"
-                ></v-btn>
-                <v-btn
-                  icon="mdi-check"
-                  size="small"
-                  variant="outlined"
-                  @click="deleteNote(note)"
-                ></v-btn>
+                <v-btn icon="mdi-close" size="small" variant="outlined" class="mr-3"
+                  @click="state.confirmDelete = false"></v-btn>
+                <v-btn icon="mdi-check" size="small" variant="outlined" @click="deleteNote(note)"></v-btn>
               </div>
               <div v-else>
-                <v-btn
-                  icon="mdi-delete"
-                  size="small"
-                  variant="outlined"
-                  class="mr-3"
-                  @click="state.confirmDelete = true"
-                ></v-btn>
-                <v-btn
-                  icon="mdi-pencil"
-                  size="small"
-                  variant="outlined"
-                  @click="editNote(note)"
-                ></v-btn>
+                <v-btn icon="mdi-delete" size="small" variant="outlined" class="mr-3"
+                  @click="state.confirmDelete = true"></v-btn>
+                <v-btn icon="mdi-pencil" size="small" variant="outlined" @click="editNote(note)"></v-btn>
               </div>
             </v-row>
           </v-col>
