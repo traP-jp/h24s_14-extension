@@ -484,87 +484,93 @@ function editNote(note: note) {
   saveNotes()
 }
 
-function observeTargetDiv() {
-  // create a button fixed on the website which has text 'DLEETE TEST' and calls deleteNote function
-  // const deleteButton = document.createElement('button');
-  // deleteButton.innerHTML = "DELETE TEST";
-  // deleteButton.style.position = 'fixed';
-  // deleteButton.style.top = '10px';
-  // deleteButton.style.right = '10px';
-  // deleteButton.style.zIndex = '1000';
-  // deleteButton.style.backgroundColor = 'red';
-  // deleteButton.style.color = 'white';
-  // deleteButton.style.padding = '10px';
-  // deleteButton.style.border = 'none';
-  // deleteButton.style.borderRadius = '5px';
-  // deleteButton.style.cursor = 'pointer';
-  // deleteButton.onclick = function () {
-  //     // get the first note where text is not null and call deleteNote
-  //     const note = Array.from(messagesNotes.values()).find((note) => note.text !== null);
-  //     if (note) {
-  //         deleteNote(note);
-  //     }
-  // }
-  // document.body.appendChild(deleteButton);
-  // build test button with text box which when pressed edits the first note where text is not null
-  // const editButton = document.createElement('button');
-  // editButton.innerHTML = "EDIT TEST";
-  // editButton.style.position = 'fixed';
-  // editButton.style.top = '10px';
-  // editButton.style.right = '100px';
-  // editButton.style.zIndex = '1000';
-  // editButton.style.backgroundColor = 'blue';
-  // editButton.style.color = 'white';
-  // editButton.style.padding = '10px';
-  // editButton.style.border = 'none';
-  // editButton.style.borderRadius = '5px';
-  // editButton.style.cursor = 'pointer';
-  // editButton.onclick = function () {
-  //     // get the first note where text is not null and call deleteNote
-  //     const note = Array.from(messagesNotes.values()).find((note) => note.text !== null);
-  //     if (note) {
-  //         editNote({
-  //             id: note.id,
-  //             text: "EDITED",
-  //             color: note.color,
-  //             creationTimestamp: note.creationTimestamp
-  //         });
-  //     }
-  // }
-  // document.body.appendChild(editButton);
-  //-----------------------------------------------------------------------------------
+function editNote(note: note) {
+    const idString = JSON.stringify(note.id);
+    // edit note.text
+    messagesNotes.get(idString)!.text = note.text;
 
-  chrome.storage.sync.get('data', function (result) {
-    console.log('Loaded', result.data)
-    // transform note array to messsagesNotes mpa
-    messagesNotes = new Map(result.data.map((note: note) => [JSON.stringify(note.id), note]))
-  })
-
-  // listen on messages
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request)
-    const msg: message = request as message
-    if (msg.method === 'delete') {
-      deleteNote(msg.content)
-    } else if (msg.method === 'edit') {
-      console.log('Edit')
-      editNote(msg.content)
+    // find the container
+    const container = getContainerById(note.id);
+    if (container) {
+        // find notes-container
+        const notesDiv = container.querySelector('div.notes-container');
+        if (notesDiv) {
+            // find textarea
+            const textarea = notesDiv.querySelector('.note-textarea') as HTMLTextAreaElement;
+            if (textarea) {
+                textarea.innerHTML = note.text as string;
+            }
+        }
     }
-  })
+    saveNotes();
+}
 
-  const targetDiv = document.querySelector(`div.${targetDivClass}`)
+function observeTargetDiv() {
 
-  if (targetDiv) {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' || mutation.type === 'characterData') {
-          // measure time
-          // console.time('findMessages');
-          findMessages()
-          // console.timeEnd('findMessages');
-          // console.time('updateUI');
-          updateUI()
-          // console.timeEnd('updateUI');
+    // create a button fixed on the website which has text 'DLEETE TEST' and calls deleteNote function
+    // const deleteButton = document.createElement('button');
+    // deleteButton.innerHTML = "DELETE TEST";
+    // deleteButton.style.position = 'fixed';
+    // deleteButton.style.top = '10px';
+    // deleteButton.style.right = '10px';
+    // deleteButton.style.zIndex = '1000';
+    // deleteButton.style.backgroundColor = 'red';
+    // deleteButton.style.color = 'white';
+    // deleteButton.style.padding = '10px';
+    // deleteButton.style.border = 'none';
+    // deleteButton.style.borderRadius = '5px';
+    // deleteButton.style.cursor = 'pointer';
+    // deleteButton.onclick = function () {
+    //     // get the first note where text is not null and call deleteNote
+    //     const note = Array.from(messagesNotes.values()).find((note) => note.text !== null);
+    //     if (note) {
+    //         deleteNote(note);
+    //     }
+    // }
+    // document.body.appendChild(deleteButton);
+    // build test button with text box which when pressed edits the first note where text is not null
+    // const editButton = document.createElement('button');
+    // editButton.innerHTML = "EDIT TEST";
+    // editButton.style.position = 'fixed';
+    // editButton.style.top = '10px';
+    // editButton.style.right = '100px';
+    // editButton.style.zIndex = '1000';
+    // editButton.style.backgroundColor = 'blue';
+    // editButton.style.color = 'white';
+    // editButton.style.padding = '10px';
+    // editButton.style.border = 'none';
+    // editButton.style.borderRadius = '5px';
+    // editButton.style.cursor = 'pointer';
+    // editButton.onclick = function () {
+    //     // get the first note where text is not null and call deleteNote
+    //     const note = Array.from(messagesNotes.values()).find((note) => note.text !== null);
+    //     if (note) {
+    //         editNote({
+    //             id: note.id,
+    //             text: "EDITED",
+    //             color: note.color,
+    //             creationTimestamp: note.creationTimestamp
+    //         });
+    //     }
+    // }
+    // document.body.appendChild(editButton);
+    //-----------------------------------------------------------------------------------
+
+    chrome.storage.sync.get('data', function (result) {
+        console.log("Loaded", result.data)
+        // transform note array to messsagesNotes mpa
+        messagesNotes = new Map(result.data.map((note: note) => [JSON.stringify(note.id), note]));
+    });
+
+    // listen on messages
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log(request);
+        const msg: message = request as message;
+        if (msg.method === 'delete') {
+            deleteNote(msg.content);
+        } else if (msg.method === 'edit') {
+            console.log("Edit")
+            editNote(msg.content);
         }
       })
     })
