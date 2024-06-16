@@ -17,9 +17,14 @@ export const useNotesStore = defineStore('notes', () => {
       method: 'edit',
       content: content
     }
-    chrome.tabs.getCurrent(function (tab) {
-      chrome.tabs.sendMessage(tab.id, message)
-    })
+    chrome.tabs.query({ currentWindow: true, active: true }).then(
+      (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id as number, message)
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   const DeleteNoteOnContentScript = (content: note) => {
@@ -27,9 +32,14 @@ export const useNotesStore = defineStore('notes', () => {
       method: 'delete',
       content: content
     }
-    chrome.tabs.getCurrent(function (tab) {
-      chrome.tabs.sendMessage(tab.id, message)
-    })
+    chrome.tabs.query({ currentWindow: true, active: true }).then(
+      (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id as number, message)
+      },
+      (error) => {
+        console.error(error)
+      }
+    )
   }
 
   return { notes, getNotesFromSyncStorage, editNoteOnContentScript, DeleteNoteOnContentScript }
