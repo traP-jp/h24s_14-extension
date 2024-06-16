@@ -17,18 +17,10 @@ const deleteNote = (note: Note) => {
   noteStore.DeleteNoteOnContentScript(note)
 }
 const backgroundColor = computed(() => (note.value.color ? note.value.color : 'success'))
-
-const channelUrl = computed(() => {
-  if (note.value.id.channelName.substring(0, 1) === '#') {
-    return `https://q.trap.jp/channels/${note.value.id.channelName.substring(1)}`
-  } else {
-    return `https://q.trap.jp/channels/${note.value.id.channelName}`
-  }
-})
 </script>
 
 <template>
-  <v-card :href="channelUrl" :color="backgroundColor" class="mx-4 my-2">
+  <v-card :color="backgroundColor" class="mx-4 my-2">
     <v-card-item>
       <v-card-title>{{ note.text }}</v-card-title>
       <v-card-subtitle>
