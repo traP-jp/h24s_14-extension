@@ -23,7 +23,7 @@ const generateNote = (index: number): note => {
       username: `user${index + 1}`,
       time: timestamp,
       messageText: `MessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessageMessage ${index + 1}`,
-      channelName: `#channel${(index % 10) + 1}`
+      channelName: `#event/hackathon/24spring/14`
     },
     text: `NoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNoteNote ${index + 1}.`,
     color: ['red', 'blue', 'green', 'yellow', 'purple', 'black', 'white', null][index % 8],
