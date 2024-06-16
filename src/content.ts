@@ -1,3 +1,4 @@
+import type { message } from './types/message'
 import type { note, noteId } from './types/note'
 import fontColorContrast from 'font-color-contrast'
 
@@ -81,7 +82,27 @@ function extractPath(element: Element) {
   return pathParts.join('')
 }
 
-function getContainerById(id: noteId, messageContainers: Element[], path: string): Element | null {
+function getContainerById(
+  id: noteId,
+  messageContainers: Element[] | null = null,
+  path: string | null = null
+): Element | null {
+  if (messageContainers === null) {
+    const containers = document.querySelectorAll(`div.${messageContainerClass}`)
+    if (!containers) {
+      throw new Error('Message containers not found')
+    }
+    messageContainers = Array.from(containers)
+  }
+
+  if (path === null) {
+    const pathContainer = document.querySelector('._container_1w237_1')
+    if (!pathContainer) {
+      throw new Error('Path container not found')
+    }
+    path = extractPath(pathContainer)
+  }
+
   const { username, time, messageText, channelName } = id
   let container = null
 
@@ -425,6 +446,36 @@ function findMessages() {
       messagesNotes.set(idString, n)
     }
   })
+}
+
+function deleteNote(note: note) {
+  console.log('Delete')
+  const idString = JSON.stringify(note.id)
+  messagesNotes.delete(idString)
+  const container = getContainerById(note.id)
+  if (container) {
+    // find notes-container
+    const notesDiv = container.querySelector('div.notes-container')
+    if (notesDiv) {
+      notesDiv.remove()
+    }
+  }
+  saveNotes()
+}
+
+function deleteNote(note: note) {
+  console.log('Delete')
+  const idString = JSON.stringify(note.id)
+  messagesNotes.delete(idString)
+  const container = getContainerById(note.id)
+  if (container) {
+    // find notes-container
+    const notesDiv = container.querySelector('div.notes-container')
+    if (notesDiv) {
+      notesDiv.remove()
+    }
+  }
+  saveNotes()
 }
 
 function observeTargetDiv() {

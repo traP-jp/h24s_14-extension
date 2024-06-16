@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import PopUp from './components/PopUp.vue'
+import { onMounted } from 'vue'
+import { useNotesStore } from './store/notes'
+
+const notesStore = useNotesStore()
+
+onMounted(() => notesStore.getNotesFromSyncStorage())
 </script>
 
 <template>
-  This is the app
-  <RouterView />
+  <PopUp />
 </template>
 
 <style>
