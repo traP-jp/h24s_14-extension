@@ -20,14 +20,16 @@ const deleteNote = (id: noteId) => {
 </script>
 
 <template>
-  <v-list-item>
-    <template #prepend>{{ note.color }}</template>
-    <v-list-item-title>{{ note.text }}</v-list-item-title>
-    <v-list-item-subtitle>{{ note.id.messageText }}</v-list-item-subtitle>
-    <template #append>
-      <v-btn icon="mdi-delete" @click="deleteNote(note.id)"></v-btn>
-    </template>
-  </v-list-item>
+  <v-card :color="note.color ? note.color : 'white'">
+    <v-card-item>
+      <v-card-title>{{ note.text }}</v-card-title>
+      <v-card-subtitle>{{ note.id.username }} {{ note.id.channelName }}</v-card-subtitle>
+      <v-card-text>{{ note.id.messageText }}</v-card-text>
+      <template #append>
+        <v-btn icon="mdi-delete" flat @click="deleteNote(note.id)"></v-btn>
+      </template>
+    </v-card-item>
+  </v-card>
 </template>
 
 <style></style>
