@@ -1,3 +1,4 @@
+import type { message } from "./types/message";
 import type { note, noteId } from "./types/note";
 import fontColorContrast from 'font-color-contrast'
 
@@ -81,7 +82,23 @@ function extractPath(element: Element) {
     return pathParts.join('');
 }
 
-function getContainerById(id: noteId, messageContainers: Element[], path: string): Element | null {
+function getContainerById(id: noteId, messageContainers: Element[] | null = null, path: string | null = null): Element | null {
+    if (messageContainers === null) {
+        const containers = document.querySelectorAll(`div.${messageContainerClass}`);
+        if (!containers) {
+            throw new Error('Message containers not found');
+        }
+        messageContainers = Array.from(containers);
+    }
+
+    if (path === null) {
+        const pathContainer = document.querySelector('._container_1w237_1');
+        if (!pathContainer) {
+            throw new Error('Path container not found');
+        }
+        path = extractPath(pathContainer);
+    }
+
     const { username, time, messageText, channelName } = id;
     let container = null;
 
@@ -422,11 +439,61 @@ function findMessages() {
     });
 }
 
+function deleteNote(note: note) {
+    console.log("Delete")
+    const idString = JSON.stringify(note.id);
+    messagesNotes.delete(idString);
+    const container = getContainerById(note.id);
+    if (container) {
+        // find notes-container
+        const notesDiv = container.querySelector('div.notes-container');
+        if (notesDiv) {
+            notesDiv.remove();
+        }
+    }
+    saveNotes();
+}
+
 function observeTargetDiv() {
+    // create a button fixed on the website which has text 'DLEETE TEST' and calls deleteNote function
+    // const deleteButton = document.createElement('button');
+    // deleteButton.innerHTML = "DELETE TEST";
+    // deleteButton.style.position = 'fixed';
+    // deleteButton.style.top = '10px';
+    // deleteButton.style.right = '10px';
+    // deleteButton.style.zIndex = '1000';
+    // deleteButton.style.backgroundColor = 'red';
+    // deleteButton.style.color = 'white';
+    // deleteButton.style.padding = '10px';
+    // deleteButton.style.border = 'none';
+    // deleteButton.style.borderRadius = '5px';
+    // deleteButton.style.cursor = 'pointer';
+    // deleteButton.onclick = function () {
+    //     // get the first note where text is not null and call deleteNote
+    //     const note = Array.from(messagesNotes.values()).find((note) => note.text !== null);
+    //     if (note) {
+    //         deleteNote(note);
+    //     }
+    // }
+    // document.body.appendChild(deleteButton);
+    //-----------------------------------------------------------------------------------
+
     chrome.storage.sync.get('data', function (result) {
         console.log("Loaded", result.data)
         // transform note array to messsagesNotes mpa
         messagesNotes = new Map(result.data.map((note: note) => [JSON.stringify(note.id), note]));
+    });
+
+    // listen on messages
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log(request);
+        const msg: message = request as message;
+        if (msg.method === 'delete') {
+            deleteNote(msg.content);
+        } else if (msg.method === 'edit') {
+            console.log("Edit")
+            // TODO:
+        }
     });
 
     const targetDiv = document.querySelector(`div.${targetDivClass}`);
