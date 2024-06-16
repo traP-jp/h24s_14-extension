@@ -29,13 +29,7 @@ const backgroundColor = computed(() => (note.value.color ? note.value.color : 's
         <div>{{ note.id.messageText }}</div>
       </v-card-subtitle>
       <template #append>
-        <v-btn
-          :color="backgroundColor"
-          icon="mdi-delete"
-          flat
-          text="true"
-          @click="deleteNote(note.id)"
-        ></v-btn>
+        <v-btn :color="backgroundColor" icon="mdi-delete" flat @click="deleteNote(note.id)"></v-btn>
       </template>
     </v-card-item>
   </v-card>
